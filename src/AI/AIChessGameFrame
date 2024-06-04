@@ -1,0 +1,22 @@
+package AI;
+import Bonus.CountDown;
+import controller.GameController;
+
+import view.ChessGameFrame;
+import view.Chessboard;
+
+import javax.swing.*;
+
+public class AIChessGameFrame extends ChessGameFrame{
+    public AIChessGameFrame(int width, int height) {
+        super(width, height);
+    }
+
+    protected void addChessboard() {
+        chessboard = new AIChessboard(CHESSBOARD_SIZE / 2, CHESSBOARD_SIZE);//相对大小，改变窗体大小就会等比改变棋盘大小
+        gameController = new GameController(chessboard);
+        CountDown.chessboard=chessboard;////新加的方法；
+        chessboard.setLocation(HEIGHT / 10, HEIGHT / 10);//棋盘位置
+        layeredPane.add(chessboard, JLayeredPane.MODAL_LAYER);//用awt的方法把棋盘加载到窗体上
+    }
+}

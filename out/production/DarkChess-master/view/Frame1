@@ -1,0 +1,273 @@
+package view;
+
+import controller.GameController;
+import view.Chessboard;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.util.ArrayList;
+
+/**
+ * 这个类表示游戏窗体，窗体上包含：
+ * 1 Chessboard: 棋盘
+ * 2 JLabel:  标签
+ * 3 JButton： 按钮
+ */
+public class ChessGameFrame extends JFrame {
+    private final int WIDTH;
+    private final int HEIGHT;
+    public final int CHESSBOARD_SIZE;
+    private GameController gameController;
+    private Chessboard chessboard;
+    private static JLabel statusLabel;
+    private static JLabel statusLabel2;
+    private static JLabel statusLabel3;
+    private static JLabel statusLabel4;
+    JLayeredPane layeredPane = new JLayeredPane();
+    BackgroundPic backgroundPic= new BackgroundPic((new ImageIcon("resources/1.png")).getImage());
+
+
+    public ChessGameFrame(int width, int height) {
+
+        setTitle("2022 CS109 Project Demo"); //设置标题
+        this.WIDTH = width;
+        this.HEIGHT = height;
+        this.CHESSBOARD_SIZE = HEIGHT * 4 / 5;
+        this.setLayeredPane(layeredPane);
+
+        setSize(WIDTH, HEIGHT);
+        setLocationRelativeTo(null); // Center the window.
+        getContentPane().setBackground(Color.WHITE);//窗体背景  这一块可以美化//Color. WHITE
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //设置程序关闭按键，如果点击右上方的叉就游戏全部关闭了
+        setLayout(null);
+    /*JPanel panel = (JPanel) getContentPane();
+    panel.setOpaque(false);*/
+
+
+        addChessboard();
+        addLabel();
+        addHelloButton();
+        addLoadButton();
+        addLabel2();
+        addLabel3();
+        addSaveGameButton();
+        addRestartButton();
+        addLabel4();
+        changeBackgroundPic();
+        addBackgroundPic1();
+
+    /*ImageIcon icon = new ImageIcon("C:\\Users\\LuoXinyi\\IdeaProjects\\Project\\src\\backgroundPic\\img3.png");
+    JLabel label = new JLabel(icon);
+    label.setBounds(0,0,WIDTH,HEIGHT);
+    getLayeredPane().add(label);*/
+
+
+    }
+    public void addBackgroundPic(BackgroundPic backgroundPic){
+        backgroundPic.setBounds(0,0,WIDTH,HEIGHT);
+        layeredPane.add(backgroundPic, JLayeredPane.DEFAULT_LAYER);
+
+    /*{
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            backgroundPic.setImg(new ImageIcon("src/backgroundPic/img"+(comboBox.getSelectedIndex()+1)+".png").getImage());
+            /*System.out.println(comboBox.getSelectedItem());
+            if (comboBox.getSelectedItem().equals("sky night")){
+                backgroundPic.setImg((new ImageIcon("src/backgroundPic/img1.png")).getImage());
+            } else if (comboBox.getSelectedItem().equals("garden")){
+                backgroundPic.setImg((new ImageIcon("src/backgroundPic/img2.png")).getImage());
+            } else if (comboBox.getSelectedItem().equals("tea pot")){
+                backgroundPic.setImg((new ImageIcon("src/backgroundPic/img3.png")).getImage());
+            }
+}
+    });*/
+
+    }
+    public void removepic(BackgroundPic backgroundPic){
+        layeredPane.remove(backgroundPic);
+    }
+    public void changeBackgroundPic(){
+        JComboBox <String> comboBox = new JComboBox<>();
+        ArrayList<String> themeList = new ArrayList<String>();
+        themeList.add("sky night");
+        themeList.add("garden");
+        themeList.add("tea pot");
+        comboBox.addItem(themeList.get(0));
+        comboBox.addItem(themeList.get(1));
+        comboBox.addItem(themeList.get(2));
+        comboBox.setLocation(WIDTH * 3 / 5-20, HEIGHT / 10+520);
+        comboBox.setSize(200, 30);
+        comboBox.setFont(new Font("Rockwell", Font.BOLD, 20));
+        comboBox.setEditable(true);
+        layeredPane.add(comboBox,JLayeredPane.MODAL_LAYER);
+
+
+        //注册监听
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(comboBox.getSelectedItem());
+                if (comboBox.getSelectedItem().equals("tea pot")){
+                    addBackgroundPic3();
+                } else if (comboBox.getSelectedItem().equals("sky night")){
+                    addBackgroundPic1();
+                } else if (comboBox.getSelectedItem().equals("garden")){
+                    addBackgroundPic2();
+                }
+            }
+            //src/backgroundPic/img"++".png
+
+        });
+    }
+
+    public void addBackgroundPic2(){
+        layeredPane.remove(backgroundPic);
+        backgroundPic.setImg((new ImageIcon("src/backgroundPic/img2.png")).getImage());
+        backgroundPic.setBounds(0,0,WIDTH,HEIGHT);
+        layeredPane.add(backgroundPic, JLayeredPane.DEFAULT_LAYER);
+    }
+
+    public void addBackgroundPic3(){
+        layeredPane.remove(backgroundPic);
+        backgroundPic.setImg((new ImageIcon("src/backgroundPic/img3.png")).getImage());
+        backgroundPic.setBounds(0,0,WIDTH,HEIGHT);
+        layeredPane.add(backgroundPic, JLayeredPane.DEFAULT_LAYER);}
+
+
+    public void addBackgroundPic1(){
+        layeredPane.remove(backgroundPic);
+        backgroundPic.setImg((new ImageIcon("src/backgroundPic/img1.png")).getImage());
+        backgroundPic.setBounds(0,0,WIDTH,HEIGHT);
+        layeredPane.add(backgroundPic, JLayeredPane.DEFAULT_LAYER);
+
+    }
+//public void addChangeTheme(){}
+
+    /**
+     * 在游戏窗体中添加棋盘
+     */
+    private void addChessboard() {
+        chessboard = new Chessboard(CHESSBOARD_SIZE / 2, CHESSBOARD_SIZE);//相对大小，改变窗体大小就会等比改变棋盘大小
+        gameController = new GameController(chessboard);
+        chessboard.setLocation(HEIGHT / 10, HEIGHT / 10);//棋盘位置
+        layeredPane.add(chessboard,JLayeredPane.MODAL_LAYER);//用awt的方法把棋盘加载到窗体上
+    }
+
+    /**
+     * 在游戏窗体中添加标签
+     */
+    private void addLabel() {
+        statusLabel = new JLabel("BLACK's TURN");
+        statusLabel.setLocation(WIDTH * 3 / 5, HEIGHT / 10);
+        statusLabel.setSize(200, 60);
+        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+        layeredPane.add(statusLabel,JLayeredPane.MODAL_LAYER);
+    }
+
+    public static JLabel getStatusLabel() {
+        return statusLabel;
+    }
+    public static JLabel getStatusLabel2() {
+        return statusLabel2;
+    }
+
+    public static JLabel getStatusLabel3() {
+        return statusLabel3;
+    }
+    public static JLabel getStatusLabel4() {
+        return statusLabel4;
+    }
+
+
+    /**
+     * 在游戏窗体中增加一个按钮，如果按下的话就会显示Hello, world!
+     */
+//通过点击button触发的事件都可以放在gamecontroller中
+    private void addHelloButton() {
+        JButton button = new JButton("Show Hello Here");
+        button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Hello, world!"));
+        button.setLocation(WIDTH * 3 / 5, HEIGHT / 10 + 90);
+        button.setSize(180, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        layeredPane.add(button,JLayeredPane.MODAL_LAYER);
+    }
+
+    // 点击按钮触发事件
+    private void addLoadButton() {
+        JButton button = new JButton("Load");
+        button.setLocation(WIDTH * 3 / 5, HEIGHT / 10 + 210);
+        button.setSize(180, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setBackground(Color.LIGHT_GRAY);
+        layeredPane.add(button,JLayeredPane.MODAL_LAYER);
+
+        button.addActionListener(e -> {//设置触发事件
+            System.out.println("Click load");
+            String path = JOptionPane.showInputDialog(this, "Input Path here");
+            chessboard.initialGameByCharacters(gameController.loadGameFromFile(path));
+            gameController.initialreversal();
+            repaint();
+        });
+
+    }
+
+    public void addRestartButton(){
+        JButton button = new JButton("Restart");
+        button.setLocation(WIDTH * 3 / 5, HEIGHT / 10 + 330 );
+        button.setSize(90,60 );
+        button.setFont(new Font("Rockwell", Font.BOLD, 15));
+        layeredPane.add(button,JLayeredPane.MODAL_LAYER);
+
+
+        button.addActionListener(e -> {
+            chessboard.initAllChessOnBoard();
+        });
+    }
+    private void addSaveGameButton() {
+        JButton button = new JButton("Save");
+        button.setLocation(WIDTH * 3 / 5 + 120, HEIGHT / 10 +330);
+        button.setSize(90, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 15));
+        button.setBackground(Color.LIGHT_GRAY);
+        layeredPane.add(button,JLayeredPane.MODAL_LAYER);
+
+        button.addActionListener(e -> {//设置触发事件
+            System.out.println("Click load");
+            String path = JOptionPane.showInputDialog(this, "Input Path here");
+            gameController.saveGame(path,chessboard.getSquareComponents());
+        });
+
+    }
+    private void addLabel2(){
+        statusLabel2= new JLabel("RED's remaining point is 60");
+        statusLabel2.setLocation(WIDTH * 3 / 5-30, HEIGHT / 10+460);
+        statusLabel2.setSize(400, 60);
+        statusLabel2.setFont(new Font("Rockwell", Font.BOLD, 20));
+        layeredPane.add(statusLabel2,JLayeredPane.MODAL_LAYER);
+    }
+    private void addLabel3(){
+        statusLabel3 = new JLabel("BLACK's remaining point is 60");
+        statusLabel3.setLocation(WIDTH * 3 / 5-45, HEIGHT / 10+410);
+        statusLabel3.setSize(400, 60);
+        statusLabel3.setFont(new Font("Rockwell", Font.BOLD, 20));
+        layeredPane.add(statusLabel3,JLayeredPane.MODAL_LAYER);
+    }
+    private void addLabel4() {
+        statusLabel4 = new JLabel("倒计时:30");
+        statusLabel4.setLocation(WIDTH * 3 / 5, HEIGHT / 10 + 40);
+        statusLabel4.setSize(200, 60);
+        statusLabel4.setFont(new Font("宋体", Font.BOLD, 30));
+        layeredPane.add(statusLabel4,JLayeredPane.MODAL_LAYER);
+    }
+
+
+          /*ImageIcon backgroundPic = new ImageIcon("C:\\Users\\LuoXinyi\\IdeaProjects\\Project\\src\\backgroundPic\\img3.png");
+          JLabel img = new JLabel(backgroundPic);*/
+}
+

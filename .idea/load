@@ -1,0 +1,169 @@
+package test.learn.algorithm;
+
+import java.io.*;
+import java.util.Scanner;
+
+import static javafx.application.Platform.exit;
+
+public class Update_sparseArry {
+    public static void main(String[] args) throws IOException {
+        Scanner sc = new Scanner(System.in);
+        int [][] arry ;
+        System.out.println("游戏开始！你可以选择以下三种模式：");
+        System.out.println("1.新建游戏");
+        System.out.println("2.读档游戏");
+        System.out.println("3.退出");
+        int num = sc.nextInt();
+        switch (num){
+            case 1:
+                arry = creatArry();
+                arry = work(arry);
+                ask(arry);
+                break;
+            case 2:
+                arry = read();
+                arry = work(arry);
+                ask(arry);
+                break;
+            case 3:
+                System.out.println("退出游戏！");
+                exit();
+                break;
+            default:
+                exit();
+                break;
+        }
+
+
+    }
+    public static void ask(int [][] arry) throws IOException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("游戏结束，请问是否存档？1是0否：");
+        int choice = sc.nextInt();
+        if(choice==1){
+            System.out.println("现在开始存档");
+            write(arry);
+        }
+    }
+    public static int[][] creatArry(){
+        //创建一个原始二维数组，大小为11*11
+        int[][] arry = new int[11][11];
+        //对二维数组部分赋值
+//        arry[1][3] = 1;//1代表黑子
+//        arry[2][4] = 2;//2代表蓝子
+//        arry[3][5] = 2;//2代表蓝子
+        System.out.println("棋盘已创建！");
+        return arry;
+    }
+    public static  void disPlay(int [][] arry){
+        for (int[] row : arry) {
+            for (int data : row) {
+                System.out.print(data+" ");
+            }
+            System.out.println();
+        }
+    }
+    public static int [][] work(int [][] arry){
+        System.out.println("请开始下棋(输入下的行列以及棋子)：");
+        Scanner sc = new Scanner(System.in);
+        int value;
+        do{
+            System.out.println("请输入行：");
+            int row = sc.nextInt();
+            System.out.println("请输入列：");
+            int col = sc.nextInt();
+            System.out.println("请输入棋子（1代表黑子 2代表蓝子 -1代表下棋结束：");
+            value = sc.nextInt();
+            if(value!=-1)
+                arry[row][col] = value;
+        }while(value!=-1);
+        disPlay(arry);
+        return arry;
+    }
+    public static  void write(int [][] arry) throws IOException {
+        //计算二维数组的有效数据的个数
+        int count=0;
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                if (arry[i][j] != 0)
+                    count++;
+            }
+        }
+        //转换成稀疏矩阵
+        int[][] arry1 = new int[count + 1][3];
+        arry1[0][0] = arry1[0][1] = 11;
+        arry1[0][2] = count;
+        int num = 1;
+        //给稀疏数组赋值
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                if (arry[i][j] != 0) {
+                    arry1[num][0] = i;
+                    arry1[num][1] = j;
+                    arry1[num][2] = arry[i][j];
+                    num++;
+                }
+            }
+        }
+        //将其写入文档
+        File file = new File("E:\\Idea_File\\1.txt");
+        if(!file.exists()){
+            file.createNewFile();
+        }
+        FileWriter fw = new FileWriter(file);
+        for (int i = 0; i < count + 1; i++) {
+            for (int j = 0; j < 3; j++) {
+                fw.write(arry1[i][j]+"\t");
+            }
+            fw.write("\n");
+
+        }
+        fw.close();//写入结束
+        System.out.println("存档结束！");
+    }
+
+    public static int[][] read() throws IOException {
+        System.out.println("开始读档.....");
+        File file = new File("E:\\Idea_File\\1.txt");
+        if(!file.exists()){
+            System.out.println("未找到文件！");
+        }
+        Reader r = new FileReader(file);
+        int [][] arry = new int[12][3];//问题所在！
+        BufferedReader br = new BufferedReader(r);
+            int count = 0;
+            String s;
+            while((s = br.readLine())!= null) {
+                String[] split = s.split("\t");
+                for(int i = 0;i<split.length;i++) {
+                    arry[count][i] = Integer.parseInt(split[i]);
+                }
+                count++;
+            }
+        br.close();
+        System.out.println("读档结束！打印读档结果：");
+        //2.将稀疏矩阵转换为二维数组
+        int row = arry[0][0];//得到二维数组的行数
+        int col = arry[0][1];//得到二维数组的列数
+        //初始化二维数组
+        int[][] arry2 = new int[row][col];
+        //遍历稀疏矩阵并为二维数组arry2赋值
+        for (int i = 1; i < count; i++) {
+            int row1 = arry[i][0];//得到行值
+            int col1 = arry[i][1];//得到列值
+            int value = arry[i][2];//得到元素值
+            arry2[row1][col1] = value;
+        }
+        //打印新二维数组
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                System.out.print(arry2[i][j] + " ");
+            }
+            System.out.println();
+        }
+        return arry2;
+
+    }
+
+}
